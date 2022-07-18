@@ -29,23 +29,23 @@ class SonarQubeReportSlack:
         os.system(cmd)
         with open('sonar_report.html') as f: report = f.read()
         count, summary = self.generate_summary(report)
-        print(summary)
         print("::set-output name=summary::%s." % summary)
         slack_status = self.post_file_to_slack(
             summary,
             'Report.html',
             report)
         # Block Build in case of blocker
-        print(slack_status)
         if int(count) > 1 and self.fail_build == "true":
             sys.exit(1)
 
     def generate_summary(self, report):
         count = 0
+        stable = ""
         html_str = fromstring(report)
         issues = html_str.xpath("//div[@class='summup']//tr/td/text()")
         isitr = iter(issues)
         issues_dict = dict(zip(isitr, isitr))
+        print("::set-output name=stable::%s." % self.get_summary_table(issues_dict))
         count = int(issues_dict.get("BLOCKER",0))+int(issues_dict.get("CRITICAL",0))
         return count, "SAST %s: %s Blocker/Critical Issues Identified in the Repository" % (self.component, str(count))
 
@@ -64,6 +64,18 @@ class SonarQubeReportSlack:
             },
             files={'file': file_bytes}).json()
 
+    def get_summary_table(self, issues_dict):
+        return """
+        | Severity | Number of Issues |
+        | --- | --- |
+        | BLOCKER | %s   |
+        | CRITICAL | %s   |
+        | MAJOR | %s   |
+        | MINOR | %s  |
+        """%(issues_dict.get("BLOCKER","0"),
+             issues_dict.get("CRITICAL","0"),
+             issues_dict.get("MAJOR","0"),
+             issues_dict.get("MINOR","0"))
     def run(self):
         self.wait_for_analysis()
         self.generate_summary_and_report()
