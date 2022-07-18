@@ -28,8 +28,9 @@ class SonarQubeReportSlack:
         cmd = cmd % (self.sonar_url, self.sonar_username, self.sonar_password, self.component)
         os.system(cmd)
         with open('sonar_report.html') as f: report = f.read()
-        count, summary = self.generate_summary(report)
-        print("::set-output name=summary::%s." % summary)
+        count, summary, summarytable = self.generate_summary(report)
+        print("::set-output name=summarytable::%s" % summarytable)
+        print("::set-output name=summary::%s" % summary)
         slack_status = self.post_file_to_slack(
             summary,
             'Report.html',
@@ -45,9 +46,9 @@ class SonarQubeReportSlack:
         issues = html_str.xpath("//div[@class='summup']//tr/td/text()")
         isitr = iter(issues)
         issues_dict = dict(zip(isitr, isitr))
-        print("::set-output name=stable::%s." % self.get_summary_table(issues_dict))
+        summary_table = self.get_summary_table(issues_dict)
         count = int(issues_dict.get("BLOCKER",0))+int(issues_dict.get("CRITICAL",0))
-        return count, "SAST %s: %s Blocker/Critical Issues Identified in the Repository" % (self.component, str(count))
+        return count, "SAST %s: %s Blocker/Critical Issues Identified in the Repository" % (self.component, str(count)), summary_table
 
     def post_file_to_slack(
             self, text, file_name, file_bytes, file_type=None, title='SonarQube Vulnerability Report '
@@ -65,17 +66,13 @@ class SonarQubeReportSlack:
             files={'file': file_bytes}).json()
 
     def get_summary_table(self, issues_dict):
-        return """
-        | Severity | Number of Issues |
-        | --- | --- |
-        | BLOCKER | %s   |
-        | CRITICAL | %s   |
-        | MAJOR | %s   |
-        | MINOR | %s  |
-        """%(issues_dict.get("BLOCKER","0"),
-             issues_dict.get("CRITICAL","0"),
-             issues_dict.get("MAJOR","0"),
-             issues_dict.get("MINOR","0"))
+        return "| Severity | Number of Issues |%0A| --- | --- |%0A| BLOCKER | {blocker} " \
+               "  |%0A| CRITICAL | {critical}   |%0A| MAJOR | {major} " \
+               " |%0A| MINOR | {minor}  |".format(blocker=issues_dict.get("BLOCKER","0"),
+             critical=issues_dict.get("CRITICAL","0"),
+             major=issues_dict.get("MAJOR","0"),
+             minor=issues_dict.get("MINOR","0"))
+    
     def run(self):
         self.wait_for_analysis()
         self.generate_summary_and_report()
