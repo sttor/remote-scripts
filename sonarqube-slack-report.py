@@ -28,8 +28,10 @@ class SonarQubeReportSlack:
         cmd = cmd % (self.sonar_url, self.sonar_username, self.sonar_password, self.component)
         os.system(cmd)
         with open('sonar_report.html') as f: report = f.read()
-        count, summary = self.generate_summary(report)
+        count, summary, summarytable = self.generate_summary(report)
+        print("::set-output name=summarytable::%s" % summarytable)
         print("::set-output name=summary::%s" % summary)
+        slack_status = self.post_file_to_slack(
         slack_status = self.post_file_to_slack(
             summary,
             'Report.html',
@@ -45,9 +47,9 @@ class SonarQubeReportSlack:
         issues = html_str.xpath("//div[@class='summup']//tr/td/text()")
         isitr = iter(issues)
         issues_dict = dict(zip(isitr, isitr))
-        print("::set-output name=summarytable::%s" % self.get_summary_table(issues_dict))
+        summary_table = self.get_summary_table(issues_dict)
         count = int(issues_dict.get("BLOCKER",0))+int(issues_dict.get("CRITICAL",0))
-        return count, "SAST %s: %s Blocker/Critical Issues Identified in the Repository" % (self.component, str(count))
+        return count, "SAST %s: %s Blocker/Critical Issues Identified in the Repository" % (self.component, str(count)), summary_table
 
     def post_file_to_slack(
             self, text, file_name, file_bytes, file_type=None, title='SonarQube Vulnerability Report '
