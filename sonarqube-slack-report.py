@@ -31,7 +31,8 @@ class SonarQubeReportSlack:
         count, summary, summarytable = self.generate_summary(report)
         print("helloworld", summary, summarytable)
         print("::set-output name=summarytable::%s" % summarytable)
-        print("::set-output name=summary::%s" % summary)
+        print("::set-output name=summary::okwhat-- %s" % summary)
+        print("endhellowworld")
         slack_status = self.post_file_to_slack(
             summary,
             'Report.html',
