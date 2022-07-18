@@ -32,7 +32,6 @@ class SonarQubeReportSlack:
         print("::set-output name=summarytable::%s" % summarytable)
         print("::set-output name=summary::%s" % summary)
         slack_status = self.post_file_to_slack(
-        slack_status = self.post_file_to_slack(
             summary,
             'Report.html',
             report)
