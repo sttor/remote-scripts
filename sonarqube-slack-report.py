@@ -29,8 +29,8 @@ class SonarQubeReportSlack:
         os.system(cmd)
         with open('sonar_report.html') as f: report = f.read()
         count, summary, summarytable = self.generate_summary(report)
-        print("::set-output name=summarytable::no-- %s" % summarytable)
-        print("::set-output name=summary::okwhat-- %s" % summary)
+        print("::set-output name=summarytable::%s" % summarytable)
+        print("::set-output name=summary::%s" % summary)
         slack_status = self.post_file_to_slack(
             summary,
             'Report.html',
@@ -66,13 +66,9 @@ class SonarQubeReportSlack:
             files={'file': file_bytes}).json()
 
     def get_summary_table(self, issues_dict):
-        return """| Severity | Number of Issues |
-        | --- | --- |
-        | BLOCKER | %s   |
-        | CRITICAL | %s   |
-        | MAJOR | %s   |
-        | MINOR | %s  |
-        """%(issues_dict.get("BLOCKER","0"),
+        return "| Severity | Number of Issues |\n| --- | --- |\n| BLOCKER | %s " \
+               "  |\n| CRITICAL | %s   |\n| MAJOR | %s " \
+               " |\n| MINOR | %s  |"%(issues_dict.get("BLOCKER","0"),
              issues_dict.get("CRITICAL","0"),
              issues_dict.get("MAJOR","0"),
              issues_dict.get("MINOR","0"))
