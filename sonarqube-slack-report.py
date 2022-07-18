@@ -66,9 +66,9 @@ class SonarQubeReportSlack:
             files={'file': file_bytes}).json()
 
     def get_summary_table(self, issues_dict):
-        return "| Severity | Number of Issues |\n| --- | --- |\n| BLOCKER | %s " \
-               "  |\n| CRITICAL | %s   |\n| MAJOR | %s " \
-               " |\n| MINOR | %s  |"%(issues_dict.get("BLOCKER","0"),
+        return "| Severity | Number of Issues |%0A| --- | --- |%0A| BLOCKER | %s " \
+               "  |%0A| CRITICAL | %s   |%0A| MAJOR | %s " \
+               " |%0A| MINOR | %s  |"%(issues_dict.get("BLOCKER","0"),
              issues_dict.get("CRITICAL","0"),
              issues_dict.get("MAJOR","0"),
              issues_dict.get("MINOR","0"))
