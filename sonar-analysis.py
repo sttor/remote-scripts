@@ -7,7 +7,7 @@ class SonarQubeReportSlack:
     def __init__(self):
         self.component = os.getenv("PROJECT_KEY")
         self.sonar_url = os.getenv("SONAR_HOST_URL")
-        self.sonar_token = os.getenv("SONAR_TOKEN")
+        self.sonar_token = os.getenv("SONAR_USER_TOKEN")
 
 
     def generate_summary_and_report(self):
