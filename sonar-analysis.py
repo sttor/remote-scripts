@@ -38,7 +38,6 @@ class SonarQubeReportSlack:
                                                   minor=issues_dict.get("MINOR", "0"))
 
     def run(self):
-        self.wait_for_analysis()
         self.generate_summary_and_report()
 
 
