@@ -5,9 +5,9 @@ from lxml.html import fromstring
 class SonarQubeReportSlack:
 
     def __init__(self):
-        self.component = os.getenv("component")
-        self.sonar_url = os.getenv("sonar_url")
-        self.sonar_token = os.getenv("sonar_token")
+        self.component = os.getenv("PROJECT_KEY")
+        self.sonar_url = os.getenv("SONAR_HOST_URL")
+        self.sonar_token = os.getenv("SONAR_TOKEN")
 
 
     def generate_summary_and_report(self):
