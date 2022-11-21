@@ -11,10 +11,10 @@ class SonarQubeReportSlack:
 
 
     def generate_summary_and_report(self):
-        cmd = """sonar-report  --sonarurl="%s" --sonartoken="%s"  --sonarcomponent="%s" --allbugs="false" > sonar_report.html """
+        cmd = """sonar-report  --sonarurl="%s" --sonartoken="%s"  --sonarcomponent="%s" """
         cmd = cmd % (self.sonar_url, self.sonar_token, self.component)
         os.system(cmd)
-        with open('sonar_report.html') as f: report = f.read()
+        with open('report.html') as f: report = f.read()
         count, summary, summarytable = self.generate_summary(report)
         print("::set-output name=summarytable::%s" % summarytable)
         print("::set-output name=summary::%s" % summary)
