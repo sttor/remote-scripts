@@ -46,7 +46,7 @@ class SonarQubeReportSlack:
         print("::set-output name=summary::%s" % summary)
         status = self.quality_gate_status()
         if status == "ERROR" and self.fail_build == "true":
-            print("Quality gate failed, check on sonarqube)"
+            print("Quality gate failed, check on sonarqube")
             sys.exit(1)
 
     def generate_summary(self, report):
