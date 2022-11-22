@@ -31,7 +31,7 @@ class SonarQubeReportSlack:
             url = self.sonar_url + "/api/qualitygates/project_status?analysisId=" + self.analysis_id
             res = requests.get(url, auth=(self.sonar_token,"")).json()
             status = res["projectStatus"]["status"]
-            print("SonarQube Quality Gate Status : "+status)
+            print("::set-output name=qualitygate::%s" % "SonarQube Quality Gate Status is : "+status)
         except Exception as e:
             print("Error with fetching quality gates")
         return status
